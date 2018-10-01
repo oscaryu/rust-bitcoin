@@ -5,7 +5,9 @@ fn do_test(data: &[u8]) {
     match tx_result {
         Err(_) => {},
         Ok(mut tx) => {
-            let len = bitcoin::consensus::encode::serialize(&tx).len() as u64;
+            let ser = bitcoin::consensus::encode::serialize(&tx);
+            assert_eq!(&ser[..], data);
+            let len = ser.len() as u64;
             let calculated_weight = tx.get_weight();
             for input in &mut tx.input {
                 input.witness = vec![];
@@ -58,7 +60,7 @@ mod tests {
     #[test]
     fn duplicate_crash() {
         let mut a = Vec::new();
-        extend_vec_from_hex("00", &mut a);
+        extend_vec_from_hex("04000000000000000000", &mut a);
         super::do_test(&a);
     }
 }
